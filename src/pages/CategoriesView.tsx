@@ -2,7 +2,7 @@ import CategoryChip from "../components/CategoryChip";
 import Header from "../components/Header";
 import Category from "../types/Category";
 import React from "react";
-import { Container, Divider, Grid, Card, CardContent, Typography } from "@mui/material";
+import { Container, Grid, Card, CardContent, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
 
 type Props = {
@@ -17,7 +17,6 @@ const CategoriesView: React.FC<Props> = ({ categories }) => {
             </Helmet>
             <Container maxWidth="lg">
                 <Header title={"Categories"} />
-                <Divider sx={{ mb: 3 }} />
                 <Grid container spacing={4}>
                     {categories.map((category) => (
                         <Grid item key={category.id} xs={12} sm={6} md={4}>

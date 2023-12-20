@@ -10,9 +10,15 @@ const NewPostBtn: React.FC<Props> = ({ newPostPage }) => {
     return (
         <Box
             role="presentation"
-            sx={{ position: "fixed", top: { xs: "auto", lg: 14 }, bottom: { xs: 16, lg: "auto" }, right: 16 }}
+            sx={{
+                position: "fixed",
+                top: { xs: "auto", lg: 14 },
+                bottom: { xs: 16, lg: "auto" },
+                right: 16,
+                zIndex: 1150,
+            }}
         >
-            <Fab size="small" aria-label="scroll back to top" component="a" href={newPostPage.route}>
+            <Fab size="small" aria-label="new post btn" component="a" href={newPostPage.route}>
                 <AddIcon />
             </Fab>
         </Box>

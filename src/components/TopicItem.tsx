@@ -22,7 +22,12 @@ const TopicItem: React.FC<Props> = ({ topic, color }) => {
                 <Grid xs={10} md={6} sx={{ display: "flex" }}>
                     {topic.status === "stickied" && <PushPinIcon />}
                     {topic.status === "closed" && <LockIcon />}
-                    <Typography variant="subtitle1" sx={{ px: 2 }}>
+                    <Typography
+                        variant="subtitle1"
+                        component="a"
+                        href="/topic/1"
+                        sx={{ px: 2, color: "inherit", textDecoration: "none", "&:hover": { color: "primary.main" } }}
+                    >
                         {topic.name}
                     </Typography>
                 </Grid>

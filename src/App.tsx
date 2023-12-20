@@ -1,10 +1,11 @@
 import Layout from "./layouts/Layout";
 import LoginLayout from "./layouts/LoginLayout";
 import HomeView from "./pages/HomeView";
+import AboutView from "./pages/AboutView";
+import NoView from "./pages/NoView";
 import CategoriesView from "./pages/CategoriesView";
 import SingleCategoryView from "./pages/SingleCategoryView";
-import BasicThreadView from "./pages/BasicThreadView";
-import StyledThreadView from "./pages/StyledThreadView";
+import TopicView from "./pages/TopicView";
 import LoginView from "./pages/LoginView";
 import SignUpView from "./pages/SignUpView";
 import Page from "./types/Page";
@@ -112,8 +113,9 @@ const App: React.FC = () => {
                                     <Route index element={<CategoriesView categories={categories} />} />
                                     <Route path="1" element={<SingleCategoryView />} />
                                 </Route>
-                                <Route path="thread/1" element={<BasicThreadView />} />
-                                <Route path="thread/1/styled" element={<StyledThreadView />} />
+                                <Route path="about" element={<AboutView />} />
+                                <Route path="topic/1" element={<TopicView />} />
+                                <Route path="*" element={<NoView />} />
                             </Route>
                             <Route element={<LoginLayout />}>
                                 <Route path="/login" element={<LoginView />} />

@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import TopicList from "../components/TopicList";
 import React from "react";
-import { Container, Divider } from "@mui/material";
+import { Container } from "@mui/material";
 import { Helmet } from "react-helmet";
 
 const SingleCategoryView: React.FC = () => {
@@ -12,7 +12,6 @@ const SingleCategoryView: React.FC = () => {
             </Helmet>
             <Container maxWidth="lg">
                 <Header title={"Music"} />
-                <Divider />
                 <TopicList />
             </Container>
         </>

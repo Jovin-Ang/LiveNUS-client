@@ -1,5 +1,5 @@
 import * as React from "react";
-import Typography from "@mui/material/Typography";
+import { Typography, Divider } from "@mui/material";
 
 type Props = {
     title: string;
@@ -7,9 +7,12 @@ type Props = {
 
 const Header: React.FC<Props> = ({ title }) => {
     return (
-        <Typography variant="h6" gutterBottom sx={{ py: 2.5 }}>
-            {title}
-        </Typography>
+        <>
+            <Typography variant="h6" gutterBottom sx={{ py: 2.5 }}>
+                {title}
+            </Typography>
+            <Divider sx={{ mb: 3 }} />
+        </>
     );
 };
 
