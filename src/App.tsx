@@ -1,11 +1,14 @@
 import Layout from "./layouts/Layout";
 import LoginLayout from "./layouts/LoginLayout";
-import Home from "./pages/Home";
+import HomeView from "./pages/HomeView";
+import CategoriesView from "./pages/CategoriesView";
+import SingleCategoryView from "./pages/SingleCategoryView";
 import BasicThreadView from "./pages/BasicThreadView";
 import StyledThreadView from "./pages/StyledThreadView";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
+import LoginView from "./pages/LoginView";
+import SignUpView from "./pages/SignUpView";
 import Page from "./types/Page";
+import Category from "./types/Category";
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -53,6 +56,37 @@ const loginSignup: Page[] = [
 
 const newPostPage: Page = { route: "/new", name: "New" };
 
+const categories: Category[] = [
+    {
+        id: 1,
+        name: "Music",
+        description:
+            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
+        postCount: 800,
+    },
+    {
+        id: 2,
+        name: "Idk",
+        description:
+            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
+        postCount: 564,
+    },
+    {
+        id: 2,
+        name: "Idk",
+        description:
+            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
+        postCount: 564,
+    },
+    {
+        id: 2,
+        name: "Idk",
+        description:
+            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
+        postCount: 564,
+    },
+];
+
 const App: React.FC = () => {
     return (
         <>
@@ -73,13 +107,17 @@ const App: React.FC = () => {
                                     />
                                 }
                             >
-                                <Route index element={<Home />} />
+                                <Route index element={<HomeView />} />
+                                <Route path="categories">
+                                    <Route index element={<CategoriesView categories={categories} />} />
+                                    <Route path="1" element={<SingleCategoryView />} />
+                                </Route>
                                 <Route path="thread/1" element={<BasicThreadView />} />
                                 <Route path="thread/1/styled" element={<StyledThreadView />} />
                             </Route>
                             <Route element={<LoginLayout />}>
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/signup" element={<SignUp />} />
+                                <Route path="/login" element={<LoginView />} />
+                                <Route path="/signup" element={<SignUpView />} />
                             </Route>
                         </Routes>
                     </BrowserRouter>

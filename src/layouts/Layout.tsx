@@ -17,7 +17,7 @@ const Layout: React.FC<Props> = ({ navBarPages, userPages, loginSignup, newPostP
         <>
             <NavBar pages={navBarPages} settings={userPages} login={loginSignup} />
             <NewPostBtn newPostPage={newPostPage} />
-            <Toolbar id="back-to-top-anchor" />
+            <Toolbar id="back-to-top-anchor" sx={{ minHeight: { xs: "5px", sm: "10px" } }} disableGutters />
             <Outlet />
             <ScrollTop />
         </>

@@ -1,3 +1,4 @@
+import ColorAvatar from "./ColorAvatar";
 import Page from "../types/Page";
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
@@ -10,7 +11,6 @@ import {
     InputBase,
     Menu,
     Container,
-    Avatar,
     Button,
     Tooltip,
     MenuItem,
@@ -28,9 +28,9 @@ type Props = {
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    backgroundColor: alpha(theme.palette.grey[400], 0.15),
     "&:hover": {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
+        backgroundColor: alpha(theme.palette.grey[400], 0.25),
     },
     marginRight: theme.spacing(2),
     marginLeft: 0,
@@ -60,7 +60,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         transition: theme.transitions.create("width"),
         width: "100%",
         [theme.breakpoints.up("md")]: {
-            width: "20ch",
+            width: "35ch",
         },
     },
 }));
@@ -87,7 +87,7 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
     };
 
     return (
-        <AppBar position="static" elevation={0} sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
+        <AppBar position="sticky" elevation={0} sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
             <Container maxWidth="lg">
                 <Toolbar disableGutters>
                     <SchoolIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -200,7 +200,7 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
                             <Box sx={{ flexGrow: 0 }}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                        <ColorAvatar name="Remy Sharp" source="/static/images/avatar/2.jpg" />
                                     </IconButton>
                                 </Tooltip>
                                 <Menu

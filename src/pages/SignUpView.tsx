@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button, TextField, Link, Box, Grid, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
 
-const SignUp: React.FC = () => {
+const SignUpView: React.FC = () => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -80,4 +80,4 @@ const SignUp: React.FC = () => {
     );
 };
 
-export default SignUp;
+export default SignUpView;
