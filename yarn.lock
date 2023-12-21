@@ -8488,6 +8488,16 @@ react-helmet@^6.1.0:
     react-fast-compare "^3.1.1"
     react-side-effect "^2.1.0"
 
+react-hook-form-mui@^6.7.3:
+  version "6.7.3"
+  resolved "https://registry.yarnpkg.com/react-hook-form-mui/-/react-hook-form-mui-6.7.3.tgz#98f48561065c05fa8827cea3d70b1ccf9575dca7"
+  integrity sha512-QmqfbeeCL4ms2N8Hj9An/02EyEp4LOW5DRPf4QbMj8lIouRRN7o/jQ0Ltq1CzCIlmagkD+rhfr6ILoXce75Q8g==
+
+react-hook-form@^7.49.2:
+  version "7.49.2"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.49.2.tgz#6fb2742e1308020f26cb1915c7012b6c07b11ade"
+  integrity sha512-TZcnSc17+LPPVpMRIDNVITY6w20deMdNi6iehTFLV1x8SqThXGwu93HjlUVU09pzFgZH7qZOvLMM7UYf2ShAHA==
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"

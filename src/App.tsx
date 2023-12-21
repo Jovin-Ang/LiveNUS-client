@@ -5,6 +5,7 @@ import AboutView from "./pages/AboutView";
 import NoView from "./pages/NoView";
 import CategoriesView from "./pages/CategoriesView";
 import SingleCategoryView from "./pages/SingleCategoryView";
+import NewTopicView from "./pages/NewTopicView";
 import TopicView from "./pages/TopicView";
 import LoginView from "./pages/LoginView";
 import SignUpView from "./pages/SignUpView";
@@ -114,6 +115,7 @@ const App: React.FC = () => {
                                     <Route path="1" element={<SingleCategoryView />} />
                                 </Route>
                                 <Route path="about" element={<AboutView />} />
+                                <Route path="new" element={<NewTopicView />} />
                                 <Route path="topic/1" element={<TopicView />} />
                                 <Route path="*" element={<NoView />} />
                             </Route>
