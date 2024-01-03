@@ -1,6 +1,8 @@
 import ColorAvatar from "./ColorAvatar";
+import { useAuth } from "../hooks/useAuth";
 import Page from "../types/Page";
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
 import {
     AppBar,
@@ -14,10 +16,13 @@ import {
     Button,
     Tooltip,
     MenuItem,
+    Backdrop,
+    CircularProgress,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import SchoolIcon from "@mui/icons-material/School";
+import { useEffect } from "react";
 
 type Props = {
     pages: Page[];
@@ -65,11 +70,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const loggedIn: boolean = true;
-
 const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
+    const auth = useAuth();
+    const navigate = useNavigate();
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [logout, setLogout] = React.useState<boolean>(false);
+
+    useEffect(() => {
+        if (logout) {
+            navigate("/");
+        }
+    }, [logout]);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -86,9 +98,17 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
         setAnchorElUser(null);
     };
 
+    const handleLogOut = async () => {
+        await auth!.logOut();
+        setLogout(true);
+    };
+
     return (
         <AppBar position="sticky" elevation={0} sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
             <Container maxWidth="lg">
+                <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={logout}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <Toolbar disableGutters>
                     <SchoolIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
                     <Typography
@@ -188,7 +208,7 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
                         ))}
                     </Box>
 
-                    {loggedIn ? (
+                    {auth?.user ? (
                         <>
                             <Search>
                                 <SearchIconWrapper>
@@ -200,7 +220,10 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
                             <Box sx={{ flexGrow: 0 }}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <ColorAvatar name="Remy Sharp" source="/static/images/avatar/2.jpg" />
+                                        <ColorAvatar
+                                            name={auth.user.first_name.concat(" ", auth.user.last_name)}
+                                            source="/static/images/avatar/2.jpg"
+                                        />
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
@@ -234,6 +257,9 @@ const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
                                             </Typography>
                                         </MenuItem>
                                     ))}
+                                    <MenuItem key="logout" onClick={handleLogOut}>
+                                        <Typography textAlign="center">Logout</Typography>
+                                    </MenuItem>
                                 </Menu>
                             </Box>
                         </>

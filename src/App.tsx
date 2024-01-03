@@ -1,3 +1,5 @@
+import AuthLayout from "./layouts/AuthLayout";
+import ProtectedLayout from "./layouts/ProtectedLayout";
 import Layout from "./layouts/Layout";
 import LoginLayout from "./layouts/LoginLayout";
 import HomeView from "./pages/HomeView";
@@ -11,9 +13,11 @@ import LoginView from "./pages/LoginView";
 import SignUpView from "./pages/SignUpView";
 import Page from "./types/Page";
 import Category from "./types/Category";
+import { useAuth } from "./hooks/useAuth";
+import axios from "axios";
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, defer } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -48,7 +52,6 @@ const navBarPages: Page[] = [
 const userPages: Page[] = [
     { route: "/profile", name: "Profile" },
     { route: "/account", name: "Account" },
-    { route: "/logout", name: "Logout" },
 ];
 
 const loginSignup: Page[] = [
@@ -90,41 +93,71 @@ const categories: Category[] = [
 ];
 
 const App: React.FC = () => {
+    const auth = useAuth();
+
+    const router = createBrowserRouter(
+        createRoutesFromElements(
+            <>
+                <Route element={<AuthLayout />} loader={() => defer({ initPromise: auth?.initAll() })}>
+                    <Route
+                        path="/"
+                        element={
+                            <Layout
+                                navBarPages={navBarPages}
+                                userPages={userPages}
+                                loginSignup={loginSignup}
+                                newPostPage={newPostPage}
+                            />
+                        }
+                    >
+                        <Route index element={<HomeView />} loader={() => axios.get("/posts")} />
+                        <Route element={<ProtectedLayout />}>
+                            <Route path="categories">
+                                <Route index element={<CategoriesView categories={categories} />} />
+                                <Route
+                                    path=":categoryId"
+                                    loader={({ params }) => {
+                                        if (auth!.token) {
+                                            return axios.get(`/categories/${params.categoryId}`);
+                                        } else {
+                                            return false;
+                                        }
+                                    }}
+                                    element={<SingleCategoryView />}
+                                />
+                            </Route>
+                            <Route path="about" element={<AboutView />} />
+                            <Route path="new" element={<NewTopicView />} />
+                            <Route
+                                path="topic/:postId"
+                                loader={({ params }) => {
+                                    if (auth!.token) {
+                                        return axios.get(`/posts/${params.postId}`);
+                                    } else {
+                                        return false;
+                                    }
+                                }}
+                                element={<TopicView />}
+                            />
+                        </Route>
+                        <Route path="*" element={<NoView />} />
+                    </Route>
+                    <Route element={<LoginLayout />}>
+                        <Route path="/login" element={<LoginView />} />
+                        <Route path="/signup" element={<SignUpView />} />
+                    </Route>
+                </Route>
+            </>,
+        ),
+    );
+
     return (
         <>
             <Helmet defaultTitle="LiveNUS" titleTemplate="LiveNUS - %s"></Helmet>
             <div className="App">
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <BrowserRouter>
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={
-                                    <Layout
-                                        navBarPages={navBarPages}
-                                        userPages={userPages}
-                                        loginSignup={loginSignup}
-                                        newPostPage={newPostPage}
-                                    />
-                                }
-                            >
-                                <Route index element={<HomeView />} />
-                                <Route path="categories">
-                                    <Route index element={<CategoriesView categories={categories} />} />
-                                    <Route path="1" element={<SingleCategoryView />} />
-                                </Route>
-                                <Route path="about" element={<AboutView />} />
-                                <Route path="new" element={<NewTopicView />} />
-                                <Route path="topic/1" element={<TopicView />} />
-                                <Route path="*" element={<NoView />} />
-                            </Route>
-                            <Route element={<LoginLayout />}>
-                                <Route path="/login" element={<LoginView />} />
-                                <Route path="/signup" element={<SignUpView />} />
-                            </Route>
-                        </Routes>
-                    </BrowserRouter>
+                    <RouterProvider router={router} />
                 </ThemeProvider>
             </div>
         </>
