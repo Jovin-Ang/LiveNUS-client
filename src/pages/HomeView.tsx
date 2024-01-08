@@ -1,4 +1,5 @@
 import TopicList from "../components/TopicList";
+import Topic from "../types/Topic";
 import React from "react";
 import { Box, Container } from "@mui/material";
 import { Helmet } from "react-helmet";
@@ -9,11 +10,7 @@ const HomeView: React.FC = () => {
     const dataFormatter = new Jsona();
     const postsRes = useLoaderData();
     // @ts-expect-error The response passed here is a success
-    const posts = dataFormatter.deserialize(postsRes.data);
-
-    console.log(posts);
-    // TODO
-    // Render posts
+    const posts = dataFormatter.deserialize(postsRes.data) as Topic[];
 
     return (
         <>
@@ -22,7 +19,7 @@ const HomeView: React.FC = () => {
             </Helmet>
             <Container maxWidth="lg">
                 <Box sx={{ mt: 2.5 }} />
-                <TopicList />
+                <TopicList topics={posts} />
             </Container>
         </>
     );

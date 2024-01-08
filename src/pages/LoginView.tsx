@@ -69,7 +69,6 @@ const LoginView: React.FC = () => {
                 }));
             }
         } catch (e) {
-            console.log(e);
             if (e instanceof Error) {
                 setLogin((prev) => ({
                     ...prev,
@@ -147,7 +146,7 @@ const LoginView: React.FC = () => {
                 {login.error && (
                     <Alert severity="error">
                         <AlertTitle>{login.error.error}</AlertTitle>
-                        {login.error.error_description.join("<br>")}
+                        {login.error.error_description.join(", ")}
                     </Alert>
                 )}
             </Box>

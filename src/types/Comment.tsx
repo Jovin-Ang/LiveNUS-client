@@ -1,11 +1,23 @@
+import Like from "./Like";
+import Vote from "./Vote";
+import Topic from "./Topic";
+import User from "./User";
+
 type Comment = {
-    id: number;
+    readonly type: "comment";
+    id: string;
     body: string;
-    author: string;
-    likes: number;
-    upvotes: number;
-    downvotes: number;
-    timestamp: Date;
+    created_at: string;
+    updated_at: string;
+    meta: {
+        likes: number;
+        upvotes: number;
+        downvotes: number;
+    };
+    post: Topic;
+    user: User;
+    comments_likes: Like[];
+    comments_votes: Vote[];
 };
 
 export default Comment;

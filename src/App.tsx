@@ -5,6 +5,7 @@ import LoginLayout from "./layouts/LoginLayout";
 import HomeView from "./pages/HomeView";
 import AboutView from "./pages/AboutView";
 import NoView from "./pages/NoView";
+import ErrorView from "./pages/ErrorView";
 import CategoriesView from "./pages/CategoriesView";
 import SingleCategoryView from "./pages/SingleCategoryView";
 import NewTopicView from "./pages/NewTopicView";
@@ -12,7 +13,6 @@ import TopicView from "./pages/TopicView";
 import LoginView from "./pages/LoginView";
 import SignUpView from "./pages/SignUpView";
 import Page from "./types/Page";
-import Category from "./types/Category";
 import { useAuth } from "./hooks/useAuth";
 import axios from "axios";
 import React from "react";
@@ -61,44 +61,17 @@ const loginSignup: Page[] = [
 
 const newPostPage: Page = { route: "/new", name: "New" };
 
-const categories: Category[] = [
-    {
-        id: 1,
-        name: "Music",
-        description:
-            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
-        postCount: 800,
-    },
-    {
-        id: 2,
-        name: "Idk",
-        description:
-            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
-        postCount: 564,
-    },
-    {
-        id: 2,
-        name: "Idk",
-        description:
-            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
-        postCount: 564,
-    },
-    {
-        id: 2,
-        name: "Idk",
-        description:
-            "Truncation should be conditionally applicable on this long line of text as this is a much longer line than what the container can support.",
-        postCount: 564,
-    },
-];
-
 const App: React.FC = () => {
     const auth = useAuth();
 
     const router = createBrowserRouter(
         createRoutesFromElements(
             <>
-                <Route element={<AuthLayout />} loader={() => defer({ initPromise: auth?.initAll() })}>
+                <Route
+                    element={<AuthLayout />}
+                    loader={() => defer({ initPromise: auth?.initAll() })}
+                    errorElement={<ErrorView />}
+                >
                     <Route
                         path="/"
                         element={
@@ -109,11 +82,12 @@ const App: React.FC = () => {
                                 newPostPage={newPostPage}
                             />
                         }
+                        errorElement={<ErrorView />}
                     >
                         <Route index element={<HomeView />} loader={() => axios.get("/posts")} />
                         <Route element={<ProtectedLayout />}>
                             <Route path="categories">
-                                <Route index element={<CategoriesView categories={categories} />} />
+                                <Route index element={<CategoriesView />} loader={() => axios.get("/categories")} />
                                 <Route
                                     path=":categoryId"
                                     loader={({ params }) => {
@@ -127,7 +101,7 @@ const App: React.FC = () => {
                                 />
                             </Route>
                             <Route path="about" element={<AboutView />} />
-                            <Route path="new" element={<NewTopicView />} />
+                            <Route path="new" element={<NewTopicView />} loader={() => axios.get("/categories")} />
                             <Route
                                 path="topic/:postId"
                                 loader={({ params }) => {

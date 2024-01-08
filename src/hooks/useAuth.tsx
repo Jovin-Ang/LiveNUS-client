@@ -11,10 +11,19 @@ type AuthContextReturns = {
     token: string;
     initAll: () => Promise<boolean>;
     login: (data: UserLogin) => Promise<LoginResponse>;
+    signUp: (data: UserSignUp) => Promise<LoginResponse>;
     logOut: () => Promise<void>;
 };
 
 type UserLogin = {
+    readonly email: string;
+    readonly password: string;
+};
+
+type UserSignUp = {
+    readonly first_name: string;
+    readonly last_name: string;
+    readonly username: string;
     readonly email: string;
     readonly password: string;
 };
@@ -75,6 +84,36 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
             const userResponse: LoginResponse = response.data;
             expireTime.setSeconds(expireTime.getSeconds() + userResponse.expires_in);
             setUser({
+                type: "user",
+                id: userResponse.resource_owner.id,
+                username: userResponse.resource_owner.username,
+                email: userResponse.resource_owner.email,
+                first_name: userResponse.resource_owner.first_name,
+                last_name: userResponse.resource_owner.last_name,
+            });
+            setToken(userResponse.token);
+            setExpires(expireTime.getTime().toString());
+            localStorage.setItem("ACCESS_TOKEN", userResponse.token);
+            localStorage.setItem("EXPIRE_TIME", expireTime.getTime().toString());
+            localStorage.setItem("REFRESH_TOKEN", userResponse.refresh_token);
+            return userResponse;
+        } catch (e) {
+            if (isAxiosError(e) && e.response) {
+                throw e.response.data as ErrorResponse;
+            } else {
+                throw new Error("Bad request");
+            }
+        }
+    };
+
+    const signUp = async (data: UserSignUp) => {
+        try {
+            const expireTime = new Date();
+            const response = await axios.post("/tokens/sign_up", data);
+            const userResponse: LoginResponse = response.data;
+            expireTime.setSeconds(expireTime.getSeconds() + userResponse.expires_in);
+            setUser({
+                type: "user",
                 id: userResponse.resource_owner.id,
                 username: userResponse.resource_owner.username,
                 email: userResponse.resource_owner.email,
@@ -163,6 +202,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
                 const response = await axios.get("/tokens/info");
                 const userResponse: LoginResponse = response.data;
                 setUser({
+                    type: "user",
                     id: userResponse.resource_owner.id,
                     username: userResponse.resource_owner.username,
                     email: userResponse.resource_owner.email,
@@ -195,6 +235,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
             token,
             initAll,
             login,
+            signUp,
             logOut,
         }),
         [token, user],

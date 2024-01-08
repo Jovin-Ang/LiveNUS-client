@@ -22,7 +22,7 @@ function stringToColor(string: string) {
 }
 
 type Props = {
-    id: number;
+    id: string;
     name: string;
 };
 

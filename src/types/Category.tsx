@@ -1,8 +1,11 @@
+import Topic from "./Topic";
+
 type Category = {
-    id: number;
-    name: string;
-    description: string;
-    postCount: number;
+    readonly type: "category";
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    posts: Topic[];
 };
 
 export default Category;

@@ -4,12 +4,15 @@ import Category from "../types/Category";
 import React from "react";
 import { Container, Grid, Card, CardContent, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
+import { useLoaderData } from "react-router-dom";
+import Jsona from "jsona";
 
-type Props = {
-    categories: Category[];
-};
+const CategoriesView: React.FC = () => {
+    const dataFormatter = new Jsona();
+    const categoriesRes = useLoaderData();
+    // @ts-expect-error The response passed here is a success
+    const categories = dataFormatter.deserialize(categoriesRes.data) as Category[];
 
-const CategoriesView: React.FC<Props> = ({ categories }) => {
     return (
         <>
             <Helmet>
@@ -27,7 +30,7 @@ const CategoriesView: React.FC<Props> = ({ categories }) => {
                                             <CategoryChip id={category.id} name={category.name} />
                                         </Grid>
                                         <Grid item>
-                                            <Typography>Threads - {category.postCount}</Typography>
+                                            <Typography>Threads - {category.posts.length}</Typography>
                                         </Grid>
                                     </Grid>
                                     <Typography>{category.description}</Typography>

@@ -15,17 +15,20 @@ const CommentItem: React.FC<Props> = ({ comment }) => {
             <Grid container alignItems="center">
                 <Grid xs={2} md={1} sx={{ p: 2 }}>
                     <IconButton sx={{ p: 0 }}>
-                        <ColorAvatar name={comment.author} source="/static/images/avatar/2.jpg" />
+                        <ColorAvatar
+                            name={comment.user.first_name.concat(" ", comment.user.last_name)}
+                            source="/static/images/avatar/2.jpg"
+                        />
                     </IconButton>
                 </Grid>
                 <Grid xs>
                     <Typography variant="subtitle1" sx={{ px: 2 }}>
-                        {comment.author}
+                        {comment.user.username}
                     </Typography>
                 </Grid>
                 <Grid>
                     <Typography variant="subtitle1" sx={{ px: 2 }}>
-                        {comment.timestamp.toLocaleString()}
+                        {new Date(comment.created_at).toLocaleString()}
                     </Typography>
                 </Grid>
             </Grid>
@@ -38,9 +41,9 @@ const CommentItem: React.FC<Props> = ({ comment }) => {
                 </Grid>
                 <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                 <Grid xs={12} md={11}>
-                    <Button startIcon={<ThumbUpIcon />}>{comment.upvotes}</Button>
-                    <Button startIcon={<ThumbDownIcon />}>{comment.downvotes}</Button>
-                    <Button startIcon={<FavoriteIcon />}>{comment.likes}</Button>
+                    <Button startIcon={<ThumbUpIcon />}>{comment.meta.upvotes}</Button>
+                    <Button startIcon={<ThumbDownIcon />}>{comment.meta.downvotes}</Button>
+                    <Button startIcon={<FavoriteIcon />}>{comment.meta.likes}</Button>
                 </Grid>
             </Grid>
         </Paper>

@@ -1,7 +1,29 @@
 import Header from "../components/Header";
-import React, { useState } from "react";
-import { Box, Button, Container, Grid, Typography, TextField, MenuItem } from "@mui/material";
+import Category from "../types/Category";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Container, Grid, Typography, TextField, MenuItem, Alert, AlertTitle } from "@mui/material";
+import axios, { isAxiosError } from "axios";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import Jsona from "jsona";
+
+type ErrorResponse = {
+    readonly title?: string[];
+    readonly body?: string[];
+    readonly category?: string[];
+    readonly category_id?: string[];
+    readonly status?: string[];
+    readonly status_id?: string[];
+    readonly submission?: string[];
+};
+
+type SubmitState = {
+    buttonText: string;
+    allowSubmit: boolean;
+    error: ErrorResponse | null;
+    success: boolean;
+    postId: string | null;
+};
 
 function checkTitle(title: string) {
     return title !== "" && title.length < 100;
@@ -16,10 +38,23 @@ function checkCategory(category: string) {
 }
 
 const NewTopicView: React.FC = () => {
+    const navigate = useNavigate();
+    const dataFormatter = new Jsona();
+    const categoriesRes = useLoaderData();
+    // @ts-expect-error The response passed here is a success
+    const categories = dataFormatter.deserialize(categoriesRes.data) as Category[];
+
     const [newTopicData, setNewTopicData] = useState({
         title: "",
         body: "",
         category: "",
+    });
+    const [submission, setSubmission] = useState<SubmitState>({
+        buttonText: "Create Post",
+        allowSubmit: true,
+        error: null,
+        success: false,
+        postId: null,
     });
     const [titleError, setTitleError] = useState(false);
     const [titleHelperText, setTitleHelperText] = useState(
@@ -29,25 +64,72 @@ const NewTopicView: React.FC = () => {
     const [bodyHelperText, setBodyHelperText] = useState("499");
     const [categoryError, setCategoryError] = useState(false);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    useEffect(() => {
+        if (submission.success) {
+            navigate(`/${submission.postId}`);
+        }
+    }, [submission]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            title: data.get("title"),
-            category: data.get("category"),
-            body: data.get("body"),
-        });
+        let clientValidate = true;
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: false,
+            buttonText: "Creating post...",
+        }));
         if (!checkTitle(newTopicData.title)) {
             setTitleError(true);
             setTitleHelperText("Topic title is required and must be below 100 characters.");
+            clientValidate = false;
         }
         if (!checkBody(newTopicData.body)) {
             setBodyError(true);
             setBodyHelperText("Topic body is required and must be below 499 characters.");
+            clientValidate = false;
         }
         if (!checkCategory(newTopicData.category)) {
             setCategoryError(true);
+            clientValidate = false;
         }
+        if (clientValidate) {
+            try {
+                const res = await axios.post("/posts", {
+                    title: data.get("title"),
+                    category_id: data.get("category"),
+                    body: data.get("body"),
+                    status_id: 1,
+                });
+                if (res.data.id) {
+                    setSubmission((prev) => ({
+                        ...prev,
+                        success: true,
+                        postId: res.data.id,
+                    }));
+                }
+            } catch (e) {
+                if (isAxiosError(e) && e.response) {
+                    const errorData = e.response.data as ErrorResponse;
+                    setSubmission((prev) => ({
+                        ...prev,
+                        error: errorData,
+                    }));
+                } else {
+                    setSubmission((prev) => ({
+                        ...prev,
+                        error: {
+                            submission: ["Bad Request"],
+                        },
+                    }));
+                }
+            }
+        }
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: true,
+            buttonText: "Create Post",
+        }));
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,22 +195,31 @@ const NewTopicView: React.FC = () => {
                         onChange={handleChange}
                         sx={{ minWidth: 325 }}
                     >
-                        {/*{currencies.map((option) => (*/}
-                        {/*    <MenuItem key={option.value} value={option.value}>*/}
-                        {/*        {option.label}*/}
-                        {/*    </MenuItem>*/}
-                        {/*))}*/}
-                        <MenuItem key={1} value={1}>
-                            Music
-                        </MenuItem>
+                        {categories.map((category) => (
+                            <MenuItem key={category.id} value={category.id}>
+                                {category.name}
+                            </MenuItem>
+                        ))}
                     </TextField>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-                                Create Post
+                            <Button
+                                type="submit"
+                                disabled={!submission.allowSubmit}
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                {submission.buttonText}
                             </Button>
                         </Grid>
                     </Grid>
+                    {submission.error &&
+                        Object.entries(submission.error).map(([key, values]) => (
+                            <Alert key={key} severity="error">
+                                <AlertTitle>{"Error in " + key}</AlertTitle>
+                                {values.join(", ")}
+                            </Alert>
+                        ))}
                 </Box>
             </Container>
         </>
