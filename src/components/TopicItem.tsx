@@ -50,13 +50,40 @@ const TopicItem: React.FC<Props> = ({ topic, color }) => {
                     </Grid>
                     <Grid item xs>
                         <Typography variant="subtitle1" sx={{ px: 2 }}>
-                            1h
+                            {timeSince(new Date(topic.meta.last_activity))}
                         </Typography>
                     </Grid>
                 </Grid>
             </Grid>
         </Paper>
     );
+};
+
+const timeSince = (date: Date) => {
+    const seconds = Math.floor((new Date().valueOf() - date.valueOf()) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+
+    if (interval >= 1) {
+        return interval + "Y";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+        return interval + "M";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+        return interval + "d";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+        return interval + "h";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+        return interval + "m";
+    }
+    return Math.floor(seconds) + "s";
 };
 
 export default TopicItem;

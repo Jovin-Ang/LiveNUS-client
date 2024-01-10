@@ -66,7 +66,7 @@ const NewTopicView: React.FC = () => {
 
     useEffect(() => {
         if (submission.success) {
-            navigate(`/${submission.postId}`);
+            navigate(`/topic/${submission.postId}`);
         }
     }, [submission]);
 
@@ -101,11 +101,11 @@ const NewTopicView: React.FC = () => {
                     body: data.get("body"),
                     status_id: 1,
                 });
-                if (res.data.id) {
+                if (res.data.data.id) {
                     setSubmission((prev) => ({
                         ...prev,
                         success: true,
-                        postId: res.data.id,
+                        postId: res.data.data.id,
                     }));
                 }
             } catch (e) {

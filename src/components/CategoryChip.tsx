@@ -28,7 +28,13 @@ type Props = {
 
 const CategoryChip: React.FC<Props> = ({ id, name }) => {
     return (
-        <Chip label={name} component="a" href={"/categories/" + id} clickable sx={{ bgcolor: stringToColor(name) }} />
+        <Chip
+            label={name}
+            component="a"
+            href={"/categories/" + id}
+            clickable
+            sx={{ color: "#fff", bgcolor: stringToColor(name) }}
+        />
     );
 };
 
