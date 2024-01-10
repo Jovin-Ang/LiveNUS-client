@@ -5,7 +5,7 @@ import User from "./User";
 
 type Comment = {
     readonly type: "comment";
-    id: string;
+    readonly id: string;
     body: string;
     created_at: string;
     updated_at: string;

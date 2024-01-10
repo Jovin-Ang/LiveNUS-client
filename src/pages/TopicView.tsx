@@ -1,21 +1,50 @@
 import CategoryChip from "../components/CategoryChip";
 import CommentItem from "../components/CommentItem";
+import CommentForm from "../components/CommentForm";
 import ColorAvatar from "../components/ColorAvatar";
 import Topic from "../types/Topic";
-import React from "react";
+import Comment from "../types/Comment";
+import React, { useReducer } from "react";
 import { Helmet } from "react-helmet";
-import { Container, Grid, Divider, Button, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Container, Grid, Divider, Button, IconButton, Paper, Stack, Typography, Snackbar, Alert } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
 
+enum CommentActionKind {
+    CREATE = "CREATE",
+    UPDATE = "UPDATE",
+    DELETE = "DELETE",
+}
+
+interface CommentAction {
+    type: CommentActionKind;
+    comment: Comment;
+}
+
 const TopicView: React.FC = () => {
     const dataFormatter = new Jsona();
     const postRes = useLoaderData();
     // @ts-expect-error The response passed here is a success
     const topic = dataFormatter.deserialize(postRes.data) as Topic;
+    const [comments, dispatch] = useReducer(commentsReducer, topic.comments || []);
+
+    // Snackbars
+    const [createSnackbar, setCreateSnackbar] = React.useState(false);
+    const [updateSnackbar, setUpdateSnackbar] = React.useState(false);
+    const [deleteSnackbar, setDeleteSnackbar] = React.useState(false);
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+
+        setCreateSnackbar(false);
+        setUpdateSnackbar(false);
+        setDeleteSnackbar(false);
+    };
 
     return (
         <>
@@ -41,7 +70,7 @@ const TopicView: React.FC = () => {
                             </Grid>
                             <Grid>
                                 <Typography variant="subtitle1" sx={{ px: 2 }}>
-                                    {"8 June"}
+                                    {new Date(topic.created_at).toLocaleString()}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -63,12 +92,60 @@ const TopicView: React.FC = () => {
                             </Grid>
                         </Grid>
                     </Paper>
-                    {topic.comments &&
-                        topic.comments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
+                    {!!comments.length &&
+                        comments.map((comment) => (
+                            <CommentItem
+                                key={comment.id}
+                                comment={comment}
+                                updateSnackbar={setUpdateSnackbar}
+                                updateComment={(c) => dispatch({ type: CommentActionKind.UPDATE, comment: c })}
+                                deleteComment={(c) => {
+                                    dispatch({ type: CommentActionKind.DELETE, comment: c });
+                                    setDeleteSnackbar(true);
+                                }}
+                            />
+                        ))}
+                    <CommentForm
+                        postId={topic.id}
+                        createComment={(c: Comment) => {
+                            dispatch({ type: CommentActionKind.CREATE, comment: c });
+                            setCreateSnackbar(true);
+                        }}
+                    />
                 </Stack>
+                <Snackbar open={createSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+                        Reply posted!
+                    </Alert>
+                </Snackbar>
+                <Snackbar open={updateSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+                        Reply updated!
+                    </Alert>
+                </Snackbar>
+                <Snackbar open={deleteSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+                        Reply deleted!
+                    </Alert>
+                </Snackbar>
             </Container>
         </>
     );
+};
+
+// Reducer function for comments
+const commentsReducer = (comments: Comment[], action: CommentAction) => {
+    const { type, comment } = action;
+    switch (type) {
+        case CommentActionKind.CREATE:
+            return [comment, ...comments];
+        case CommentActionKind.UPDATE:
+            return comments.map((c) => (c.id === comment.id ? comment : c));
+        case CommentActionKind.DELETE:
+            return comments.filter((c) => c.id !== comment.id);
+        default:
+            return comments;
+    }
 };
 
 export default TopicView;

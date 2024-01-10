@@ -1,15 +1,100 @@
 import ColorAvatar from "./ColorAvatar";
+import { useAuth } from "../hooks/useAuth";
 import Comment from "../types/Comment";
-import React from "react";
-import { Paper, Grid, Typography, Button, IconButton } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Paper, Box, Grid, Typography, Button, IconButton, TextField, Alert, AlertTitle } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios, { isAxiosError } from "axios";
+
+type ErrorResponse = {
+    readonly body?: string[];
+    readonly post?: string[];
+    readonly post_id?: string[];
+    readonly submission?: string[];
+};
+
+type SubmitState = {
+    buttonText: string;
+    allowSubmit: boolean;
+    error: ErrorResponse | null;
+    success: boolean;
+};
 
 type Props = {
     comment: Comment;
+    updateSnackbar: React.Dispatch<React.SetStateAction<boolean>>;
+    updateComment: (comment: Comment) => void;
+    deleteComment: (comment: Comment) => void;
 };
-const CommentItem: React.FC<Props> = ({ comment }) => {
+const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, deleteComment }) => {
+    const auth = useAuth();
+    const [body, setBody] = useState(comment.body);
+    const [submission, setSubmission] = useState<SubmitState>({
+        buttonText: "Save",
+        allowSubmit: true,
+        error: null,
+        success: false,
+    });
+    const [helperText, setHelperText] = useState(comment.body.length);
+    const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        if (submission.success) {
+            updateSnackbar(true);
+            updateComment(comment);
+        }
+    }, [submission]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: false,
+            buttonText: "Updating reply...",
+        }));
+        try {
+            await axios.patch("/comments/" + comment.id, {
+                body: data.get("body"),
+            });
+            comment.body = data.get("body") as string;
+            setSubmission((prev) => ({
+                ...prev,
+                success: true,
+            }));
+            setIsEditing(false);
+        } catch (e) {
+            if (isAxiosError(e) && e.response) {
+                const errorData = e.response.data as ErrorResponse;
+                setSubmission((prev) => ({
+                    ...prev,
+                    error: errorData,
+                }));
+            } else {
+                setSubmission((prev) => ({
+                    ...prev,
+                    error: {
+                        submission: ["Bad Request"],
+                    },
+                }));
+            }
+        }
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: true,
+            buttonText: "Save",
+        }));
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setBody(event.target.value);
+        setHelperText(500 - body.length);
+    };
+
     return (
         <Paper square elevation={0} sx={{ px: 2, py: 2.5, bgcolor: "#fff" }}>
             <Grid container alignItems="center">
@@ -35,16 +120,82 @@ const CommentItem: React.FC<Props> = ({ comment }) => {
             <Grid container>
                 <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                 <Grid xs={12} md={11}>
-                    <Typography paragraph sx={{ px: 2 }}>
-                        {comment.body}
-                    </Typography>
+                    {isEditing ? (
+                        <Box component="form" onSubmit={handleSubmit}>
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                variant="filled"
+                                multiline
+                                minRows={5}
+                                maxRows={10}
+                                name="body"
+                                label="Editing reply..."
+                                id="body"
+                                value={body}
+                                helperText={helperText}
+                                inputProps={{ maxLength: 500 }}
+                                onChange={handleChange}
+                                required
+                            />
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setIsEditing(false)}
+                                        sx={{ mr: 3, mb: 2 }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button
+                                        type="submit"
+                                        disabled={!submission.allowSubmit}
+                                        variant="contained"
+                                        sx={{ mb: 2 }}
+                                    >
+                                        {submission.buttonText}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            {submission.error &&
+                                Object.entries(submission.error).map(([key, values]) => (
+                                    <Alert key={key} severity="error">
+                                        <AlertTitle>{"Error in " + key}</AlertTitle>
+                                        {values.join(", ")}
+                                    </Alert>
+                                ))}
+                        </Box>
+                    ) : (
+                        <>
+                            <Typography paragraph sx={{ px: 2 }}>
+                                {comment.body}
+                            </Typography>
+                            {comment.created_at != comment.updated_at && (
+                                <Typography variant="caption" sx={{ fontStyle: "italic", px: 2 }}>
+                                    (edited {new Date(comment.updated_at).toLocaleString()})
+                                </Typography>
+                            )}
+                        </>
+                    )}
                 </Grid>
                 <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
-                <Grid xs={12} md={11}>
+                <Grid xs>
                     <Button startIcon={<ThumbUpIcon />}>{comment.meta.upvotes}</Button>
                     <Button startIcon={<ThumbDownIcon />}>{comment.meta.downvotes}</Button>
                     <Button startIcon={<FavoriteIcon />}>{comment.meta.likes}</Button>
                 </Grid>
+                {auth?.user && auth.user.id == comment.user.id && (
+                    <Grid>
+                        <IconButton onClick={() => setIsEditing(true)} disabled={isEditing} aria-label="edit">
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton aria-label="delete">
+                            <DeleteIcon />
+                        </IconButton>
+                    </Grid>
+                )}
             </Grid>
         </Paper>
     );
