@@ -41,6 +41,7 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
     });
     const [helperText, setHelperText] = useState(comment.body.length);
     const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (submission.success) {
@@ -48,6 +49,14 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
             updateComment(comment);
         }
     }, [submission]);
+
+    useEffect(() => {
+        if (isDeleting) {
+            setTimeout(() => {
+                setIsDeleting(false);
+            }, 5000);
+        }
+    }, [isDeleting]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -88,6 +97,15 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
             allowSubmit: true,
             buttonText: "Save",
         }));
+    };
+
+    const handleDelete = async () => {
+        try {
+            await axios.delete("/comments/" + comment.id);
+            deleteComment(comment);
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,9 +209,15 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
                         <IconButton onClick={() => setIsEditing(true)} disabled={isEditing} aria-label="edit">
                             <EditIcon />
                         </IconButton>
-                        <IconButton aria-label="delete">
-                            <DeleteIcon />
-                        </IconButton>
+                        {isDeleting ? (
+                            <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>
+                                Confirm
+                            </Button>
+                        ) : (
+                            <IconButton onClick={() => setIsDeleting(true)} aria-label="delete">
+                                <DeleteIcon />
+                            </IconButton>
+                        )}
                     </Grid>
                 )}
             </Grid>
