@@ -5,12 +5,33 @@ import ColorAvatar from "../components/ColorAvatar";
 import LikeVoteBtn from "../components/LikeVoteBtn";
 import Topic from "../types/Topic";
 import Comment from "../types/Comment";
-import React from "react";
+import { useAuth } from "../hooks/useAuth";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
-import { Container, Grid, Divider, IconButton, Paper, Stack, Typography, Snackbar, Alert } from "@mui/material";
+import {
+    Container,
+    Grid,
+    Divider,
+    Button,
+    IconButton,
+    Paper,
+    Stack,
+    Typography,
+    Snackbar,
+    Alert,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import LockIcon from "@mui/icons-material/Lock";
-import { useLoaderData } from "react-router-dom";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
+import axios from "axios";
 
 enum CommentActionKind {
     CREATE = "CREATE",
@@ -24,16 +45,53 @@ interface CommentAction {
 }
 
 const TopicView: React.FC = () => {
+    const navigate = useNavigate();
+    const auth = useAuth();
     const dataFormatter = new Jsona();
     const postRes = useLoaderData();
     // @ts-expect-error The response passed here is a success
     const topic = dataFormatter.deserialize(postRes.data) as Topic;
     const [comments, dispatch] = React.useReducer(commentsReducer, topic.comments || []);
 
+    // States
+    const [isEditing, setIsEditing] = useState(false);
+    const [deleteStatus, setDeleteStatus] = useState({
+        confirmation: false,
+        isDeleting: false,
+        deleted: false,
+    });
+
     // Snackbars
     const [createSnackbar, setCreateSnackbar] = React.useState(false);
     const [updateSnackbar, setUpdateSnackbar] = React.useState(false);
     const [deleteSnackbar, setDeleteSnackbar] = React.useState(false);
+
+    const handleDelete = async () => {
+        setDeleteStatus({
+            ...deleteStatus,
+            isDeleting: true,
+        });
+        try {
+            await axios.delete("/posts/" + topic.id);
+            setDeleteStatus({
+                ...deleteStatus,
+                isDeleting: true,
+                deleted: true,
+            });
+            setTimeout(() => {
+                navigate("/");
+            }, 5000);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const handleDialogClose = () => {
+        setDeleteStatus({
+            ...deleteStatus,
+            confirmation: false,
+        });
+    };
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
@@ -84,7 +142,7 @@ const TopicView: React.FC = () => {
                                 <Typography paragraph>{topic.body}</Typography>
                             </Grid>
                             <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
-                            <Grid xs={12} md={11}>
+                            <Grid xs>
                                 <LikeVoteBtn
                                     type={"POST"}
                                     id={topic.id}
@@ -95,6 +153,23 @@ const TopicView: React.FC = () => {
                                     likes={topic.posts_likes}
                                 />
                             </Grid>
+                            {auth?.user && auth.user.id == topic.user.id && (
+                                <Grid>
+                                    <IconButton
+                                        onClick={() => setIsEditing(true)}
+                                        disabled={isEditing}
+                                        aria-label="edit"
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        onClick={() => setDeleteStatus({ ...deleteStatus, confirmation: true })}
+                                        aria-label="delete"
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Grid>
+                            )}
                         </Grid>
                     </Paper>
                     {!!comments.length &&
@@ -140,6 +215,29 @@ const TopicView: React.FC = () => {
                     </Alert>
                 </Snackbar>
             </Container>
+            <Dialog
+                open={deleteStatus.confirmation}
+                onClose={handleDialogClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Delete this topic?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {deleteStatus.deleted
+                            ? "Topic deleted, redirecting to home..."
+                            : "All comments, likes and votes will be deleted as well."}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button disabled={deleteStatus.isDeleting} onClick={handleDialogClose}>
+                        Cancel
+                    </Button>
+                    <Button disabled={deleteStatus.isDeleting} onClick={handleDelete} autoFocus>
+                        {deleteStatus.isDeleting ? <CircularProgress color="inherit" /> : "Confirm"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
