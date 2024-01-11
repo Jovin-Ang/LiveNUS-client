@@ -87,7 +87,17 @@ const App: React.FC = () => {
                         <Route index element={<HomeView />} loader={() => axios.get("/posts")} />
                         <Route element={<ProtectedLayout />}>
                             <Route path="categories">
-                                <Route index element={<CategoriesView />} loader={() => axios.get("/categories")} />
+                                <Route
+                                    index
+                                    element={<CategoriesView />}
+                                    loader={() => {
+                                        if (auth!.token) {
+                                            return axios.get("/categories");
+                                        } else {
+                                            return false;
+                                        }
+                                    }}
+                                />
                                 <Route
                                     path=":categoryId"
                                     loader={({ params }) => {
@@ -101,7 +111,17 @@ const App: React.FC = () => {
                                 />
                             </Route>
                             <Route path="about" element={<AboutView />} />
-                            <Route path="new" element={<NewTopicView />} loader={() => axios.get("/categories")} />
+                            <Route
+                                path="new"
+                                element={<NewTopicView />}
+                                loader={() => {
+                                    if (auth!.token) {
+                                        return axios.get("/categories");
+                                    } else {
+                                        return false;
+                                    }
+                                }}
+                            />
                             <Route
                                 path="topic/:postId"
                                 loader={({ params }) => {
