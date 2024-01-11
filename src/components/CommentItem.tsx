@@ -108,7 +108,7 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setBody(event.target.value);
-        setHelperText(500 - body.length);
+        setHelperText(500 - event.target.value.length);
     };
 
     return (

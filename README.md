@@ -71,5 +71,4 @@ Try changing some source code and see how the app changes.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 This project uses [MUI](https://mui.com/),
-[TypewriterJS](https://github.com/tameemsafi/typewriterjs#readme),
 [ESLint](https://eslint.org/), [Prettier](https://prettier.io/).

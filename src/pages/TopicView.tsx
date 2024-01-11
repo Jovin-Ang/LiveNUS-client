@@ -6,10 +6,11 @@ import LikeVoteBtn from "../components/LikeVoteBtn";
 import Topic from "../types/Topic";
 import Comment from "../types/Comment";
 import { useAuth } from "../hooks/useAuth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import {
     Container,
+    Box,
     Grid,
     Divider,
     Button,
@@ -19,19 +20,21 @@ import {
     Typography,
     Snackbar,
     Alert,
+    AlertTitle,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LockIcon from "@mui/icons-material/Lock";
 import { useNavigate, useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 enum CommentActionKind {
     CREATE = "CREATE",
@@ -44,6 +47,19 @@ interface CommentAction {
     comment: Comment;
 }
 
+type ErrorResponse = {
+    readonly title?: string[];
+    readonly body?: string[];
+    readonly submission?: string[];
+};
+
+type SubmitState = {
+    buttonText: string;
+    allowSubmit: boolean;
+    error: ErrorResponse | null;
+    success: boolean;
+};
+
 const TopicView: React.FC = () => {
     const navigate = useNavigate();
     const auth = useAuth();
@@ -52,9 +68,22 @@ const TopicView: React.FC = () => {
     // @ts-expect-error The response passed here is a success
     const topic = dataFormatter.deserialize(postRes.data) as Topic;
     const [comments, dispatch] = React.useReducer(commentsReducer, topic.comments || []);
+    console.log(topic);
 
     // States
     const [isEditing, setIsEditing] = useState(false);
+    const [topicData, setTopicData] = useState({
+        title: topic.title,
+        body: topic.body,
+    });
+    const [titleHelperText, setTitleHelperText] = useState(topic.title.length);
+    const [bodyHelperText, setBodyHelperText] = useState(topic.body.length);
+    const [submission, setSubmission] = useState<SubmitState>({
+        buttonText: "Save",
+        allowSubmit: true,
+        error: null,
+        success: false,
+    });
     const [deleteStatus, setDeleteStatus] = useState({
         confirmation: false,
         isDeleting: false,
@@ -62,9 +91,68 @@ const TopicView: React.FC = () => {
     });
 
     // Snackbars
+    const [updateTopicSnackbar, setUpdateTopicSnackbar] = React.useState(false);
     const [createSnackbar, setCreateSnackbar] = React.useState(false);
     const [updateSnackbar, setUpdateSnackbar] = React.useState(false);
     const [deleteSnackbar, setDeleteSnackbar] = React.useState(false);
+
+    useEffect(() => {
+        if (submission.success) {
+            setUpdateTopicSnackbar(true);
+            setTimeout(() => navigate(0), 2000);
+        }
+    }, [submission]);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setTopicData({ ...topicData, [name]: value });
+        setTitleHelperText(99 - topicData.title.length);
+        setBodyHelperText(500 - topicData.body.length);
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: false,
+            buttonText: "Updating topic...",
+        }));
+        try {
+            await axios.patch("/posts/" + topic.id, {
+                title: data.get("title"),
+                body: data.get("body"),
+                status_id: 2,
+            });
+            topic.title = data.get("title") as string;
+            topic.body = data.get("body") as string;
+            setSubmission((prev) => ({
+                ...prev,
+                success: true,
+            }));
+            setIsEditing(false);
+        } catch (e) {
+            if (isAxiosError(e) && e.response) {
+                const errorData = e.response.data as ErrorResponse;
+                setSubmission((prev) => ({
+                    ...prev,
+                    error: errorData,
+                }));
+            } else {
+                setSubmission((prev) => ({
+                    ...prev,
+                    error: {
+                        submission: ["Bad Request"],
+                    },
+                }));
+            }
+        }
+        setSubmission((prev) => ({
+            ...prev,
+            allowSubmit: true,
+            buttonText: "Save",
+        }));
+    };
 
     const handleDelete = async () => {
         setDeleteStatus({
@@ -134,12 +222,82 @@ const TopicView: React.FC = () => {
                         <Grid container>
                             <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                             <Grid xs={12} md={11} sx={{ px: 2 }}>
-                                <Typography variant="h5" sx={{ pb: 2 }}>
-                                    {topic.title}
-                                </Typography>
-                                <CategoryChip id={topic.category.id} name={topic.category.name} />
-                                <Divider sx={{ pt: 1, my: 2 }} />
-                                <Typography paragraph>{topic.body}</Typography>
+                                {isEditing ? (
+                                    <Box component="form" onSubmit={handleSubmit}>
+                                        <TextField
+                                            margin="normal"
+                                            fullWidth
+                                            variant="filled"
+                                            id="title"
+                                            label="Editing subject..."
+                                            name="title"
+                                            value={topicData.title}
+                                            helperText={titleHelperText}
+                                            inputProps={{ maxLength: 99 }}
+                                            onChange={handleChange}
+                                            required
+                                            autoFocus
+                                        />
+                                        <TextField
+                                            margin="normal"
+                                            fullWidth
+                                            variant="filled"
+                                            multiline
+                                            minRows={5}
+                                            maxRows={10}
+                                            name="body"
+                                            label="Editing body..."
+                                            id="body"
+                                            value={topicData.body}
+                                            helperText={bodyHelperText}
+                                            inputProps={{ maxLength: 500 }}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <Grid container justifyContent="flex-end">
+                                            <Grid item>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={() => setIsEditing(false)}
+                                                    sx={{ mr: 3, mb: 2 }}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </Grid>
+                                            <Grid item>
+                                                <Button
+                                                    type="submit"
+                                                    disabled={!submission.allowSubmit}
+                                                    variant="contained"
+                                                    sx={{ mb: 2 }}
+                                                >
+                                                    {submission.buttonText}
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                        {submission.error &&
+                                            Object.entries(submission.error).map(([key, values]) => (
+                                                <Alert key={key} severity="error">
+                                                    <AlertTitle>{"Error in " + key}</AlertTitle>
+                                                    {values.join(", ")}
+                                                </Alert>
+                                            ))}
+                                    </Box>
+                                ) : (
+                                    <>
+                                        <Typography variant="h5" sx={{ pb: 2 }}>
+                                            {topic.title}
+                                        </Typography>
+                                        <CategoryChip id={topic.category.id} name={topic.category.name} />
+                                        <Divider sx={{ pt: 1, my: 2 }} />
+                                        <Typography paragraph>{topic.body}</Typography>
+                                        {topic.created_at != topic.updated_at && (
+                                            <Typography variant="caption" sx={{ fontStyle: "italic" }}>
+                                                (edited {new Date(topic.updated_at).toLocaleString()})
+                                            </Typography>
+                                        )}
+                                    </>
+                                )}
                             </Grid>
                             <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                             <Grid xs>
@@ -185,7 +343,7 @@ const TopicView: React.FC = () => {
                                 }}
                             />
                         ))}
-                    {topic.status.name === "closed" ? (
+                    {topic.status.name === "locked" ? (
                         <Alert icon={<LockIcon fontSize="inherit" />} severity="info">
                             This topic has been locked to prevent further replies.
                         </Alert>
@@ -199,6 +357,11 @@ const TopicView: React.FC = () => {
                         />
                     )}
                 </Stack>
+                <Snackbar open={updateTopicSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+                        Topic updated!
+                    </Alert>
+                </Snackbar>
                 <Snackbar open={createSnackbar} autoHideDuration={6000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
                         Reply posted!

@@ -1,7 +1,7 @@
 type Status = {
     type: "status";
     id: string;
-    name: "stickied" | "closed" | "open";
+    name: "stickied" | "locked" | "open";
 };
 
 export default Status;

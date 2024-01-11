@@ -24,7 +24,7 @@ const TopicItem: React.FC<Props> = ({ topic, color }) => {
                 </Grid>
                 <Grid xs={10} md={6} sx={{ display: "flex" }}>
                     {topic.status.name === "stickied" && <PushPinIcon />}
-                    {topic.status.name === "closed" && <LockIcon />}
+                    {topic.status.name === "locked" && <LockIcon />}
                     <Typography
                         variant="subtitle1"
                         component="a"
