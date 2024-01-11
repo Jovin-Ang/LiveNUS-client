@@ -1,11 +1,9 @@
 import ColorAvatar from "./ColorAvatar";
+import LikeVoteBtn from "./LikeVoteBtn";
 import { useAuth } from "../hooks/useAuth";
 import Comment from "../types/Comment";
 import React, { useEffect, useState } from "react";
 import { Paper, Box, Grid, Typography, Button, IconButton, TextField, Alert, AlertTitle } from "@mui/material";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios, { isAxiosError } from "axios";
@@ -200,9 +198,15 @@ const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, 
                 </Grid>
                 <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                 <Grid xs>
-                    <Button startIcon={<ThumbUpIcon />}>{comment.meta.upvotes}</Button>
-                    <Button startIcon={<ThumbDownIcon />}>{comment.meta.downvotes}</Button>
-                    <Button startIcon={<FavoriteIcon />}>{comment.meta.likes}</Button>
+                    <LikeVoteBtn
+                        type={"COMMENT"}
+                        id={comment.id}
+                        upvoteCount={comment.meta.upvotes}
+                        downvoteCount={comment.meta.downvotes}
+                        likeCount={comment.meta.likes}
+                        votes={comment.comments_votes}
+                        likes={comment.comments_likes}
+                    />
                 </Grid>
                 {auth?.user && auth.user.id == comment.user.id && (
                     <Grid>

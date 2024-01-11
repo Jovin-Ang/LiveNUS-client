@@ -2,14 +2,13 @@ import CategoryChip from "../components/CategoryChip";
 import CommentItem from "../components/CommentItem";
 import CommentForm from "../components/CommentForm";
 import ColorAvatar from "../components/ColorAvatar";
+import LikeVoteBtn from "../components/LikeVoteBtn";
 import Topic from "../types/Topic";
 import Comment from "../types/Comment";
-import React, { useReducer } from "react";
+import React from "react";
 import { Helmet } from "react-helmet";
-import { Container, Grid, Divider, Button, IconButton, Paper, Stack, Typography, Snackbar, Alert } from "@mui/material";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { Container, Grid, Divider, IconButton, Paper, Stack, Typography, Snackbar, Alert } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 import { useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
 
@@ -29,7 +28,7 @@ const TopicView: React.FC = () => {
     const postRes = useLoaderData();
     // @ts-expect-error The response passed here is a success
     const topic = dataFormatter.deserialize(postRes.data) as Topic;
-    const [comments, dispatch] = useReducer(commentsReducer, topic.comments || []);
+    const [comments, dispatch] = React.useReducer(commentsReducer, topic.comments || []);
 
     // Snackbars
     const [createSnackbar, setCreateSnackbar] = React.useState(false);
@@ -49,7 +48,7 @@ const TopicView: React.FC = () => {
     return (
         <>
             <Helmet>
-                <title>My post title</title>
+                <title>{topic.title}</title>
             </Helmet>
             <Container maxWidth="lg">
                 <Stack spacing={2}>
@@ -86,9 +85,15 @@ const TopicView: React.FC = () => {
                             </Grid>
                             <Grid xs={1} sx={{ display: { xs: "none", md: "flex" }, px: 2 }} />
                             <Grid xs={12} md={11}>
-                                <Button startIcon={<ThumbUpIcon />}>{topic.meta.upvotes}</Button>
-                                <Button startIcon={<ThumbDownIcon />}>{topic.meta.downvotes}</Button>
-                                <Button startIcon={<FavoriteIcon />}>{topic.meta.likes}</Button>
+                                <LikeVoteBtn
+                                    type={"POST"}
+                                    id={topic.id}
+                                    upvoteCount={topic.meta.upvotes}
+                                    downvoteCount={topic.meta.downvotes}
+                                    likeCount={topic.meta.likes}
+                                    votes={topic.posts_votes}
+                                    likes={topic.posts_likes}
+                                />
                             </Grid>
                         </Grid>
                     </Paper>
@@ -105,13 +110,19 @@ const TopicView: React.FC = () => {
                                 }}
                             />
                         ))}
-                    <CommentForm
-                        postId={topic.id}
-                        createComment={(c: Comment) => {
-                            dispatch({ type: CommentActionKind.CREATE, comment: c });
-                            setCreateSnackbar(true);
-                        }}
-                    />
+                    {topic.status.name === "closed" ? (
+                        <Alert icon={<LockIcon fontSize="inherit" />} severity="info">
+                            This topic has been locked to prevent further replies.
+                        </Alert>
+                    ) : (
+                        <CommentForm
+                            postId={topic.id}
+                            createComment={(c: Comment) => {
+                                dispatch({ type: CommentActionKind.CREATE, comment: c });
+                                setCreateSnackbar(true);
+                            }}
+                        />
+                    )}
                 </Stack>
                 <Snackbar open={createSnackbar} autoHideDuration={6000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>

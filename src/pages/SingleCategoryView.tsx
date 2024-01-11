@@ -16,7 +16,7 @@ const SingleCategoryView: React.FC = () => {
     return (
         <>
             <Helmet>
-                <title>Music</title>
+                <title>{category.name}</title>
             </Helmet>
             <Container maxWidth="lg">
                 <Header title={category.name} />
