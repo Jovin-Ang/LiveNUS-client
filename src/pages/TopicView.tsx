@@ -122,7 +122,6 @@ const TopicView: React.FC = () => {
             await axios.patch("/posts/" + topic.id, {
                 title: data.get("title"),
                 body: data.get("body"),
-                status_id: 2,
             });
             topic.title = data.get("title") as string;
             topic.body = data.get("body") as string;
