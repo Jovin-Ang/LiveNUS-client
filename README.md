@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f3111054-18cd-4ff0-b955-4293a77a6135/deploy-status)](https://app.netlify.com/sites/live-nus/deploys)
+
 # LiveNUS Frontend
 
 React frontend for LiveNUS forum. Designed to be deployed with [LiveNUS Server](https://github.com/Jovin-Ang/LiveNUS-Server).
@@ -21,7 +23,7 @@ To get the React frontend running locally:
 6. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### Deployment
-TBA
+The sits is deployed live at https://live-nus.netlify.app/
 
 ## Overview
 
