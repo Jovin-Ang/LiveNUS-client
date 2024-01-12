@@ -28,6 +28,17 @@ type Props = {
     updateComment: (comment: Comment) => void;
     deleteComment: (comment: Comment) => void;
 };
+
+/**
+ * A formatted box with a comment.
+ *
+ * @param {Comment} comment - The comment object
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} updateSnackbar - The dispatch function to
+ * show the update successful snackbar
+ * @param {(comment: Comment) => void} updateComment - Function to update the comment on the parent
+ * @param {(comment: Comment) => void} deleteComment - Function to delete the comment on the parent
+ * @returns {React.FunctionComponent} A box with a comment
+ */
 const CommentItem: React.FC<Props> = ({ comment, updateSnackbar, updateComment, deleteComment }) => {
     const auth = useAuth();
     const [body, setBody] = useState(comment.body);

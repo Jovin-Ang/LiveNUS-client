@@ -10,6 +10,15 @@ type Props = {
     topic: Topic;
     color: string;
 };
+
+/**
+ * A formatted box linking to a post. Contains title, number of likes and comments,
+ * and last updated time relative to current time.
+ *
+ * @param {Topic} topic - A topic object
+ * @param {string} color - Background color of the box
+ * @returns {React.FunctionComponent} A box with a comment
+ */
 const TopicItem: React.FC<Props> = ({ topic, color }) => {
     return (
         <Paper square elevation={0} sx={{ px: 2, py: 2.5, bgcolor: color }}>
@@ -59,7 +68,7 @@ const TopicItem: React.FC<Props> = ({ topic, color }) => {
     );
 };
 
-const timeSince = (date: Date) => {
+export const timeSince = (date: Date) => {
     const seconds = Math.floor((new Date().valueOf() - date.valueOf()) / 1000);
 
     let interval = Math.floor(seconds / 31536000);

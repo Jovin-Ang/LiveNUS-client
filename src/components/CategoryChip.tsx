@@ -1,7 +1,13 @@
 import * as React from "react";
 import Chip from "@mui/material/Chip";
 
-function stringToColor(string: string) {
+/**
+ * Converts a string to a HEX color code.
+ *
+ * @param {string} string - The string to convert
+ * @returns {string} The HEX color code
+ */
+export function stringToColor(string: string) {
     let hash = 0;
     let i;
 
@@ -26,6 +32,13 @@ type Props = {
     name: string;
 };
 
+/**
+ * A clickable chip with category name.
+ *
+ * @param {string} id - ID of the category
+ * @param {string} name - Name of the category
+ * @returns {React.FunctionComponent} The category chip
+ */
 const CategoryChip: React.FC<Props> = ({ id, name }) => {
     return (
         <Chip

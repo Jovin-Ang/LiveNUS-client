@@ -6,6 +6,13 @@ import AddIcon from "@mui/icons-material/Add";
 type Props = {
     newPostPage: Page;
 };
+
+/**
+ * A floating action button that links to the new post page.
+ *
+ * @param {Page} newPostPage - Page object for creating a new post
+ * @returns {React.FunctionComponent} A floating action button
+ */
 const NewPostBtn: React.FC<Props> = ({ newPostPage }) => {
     return (
         <Box

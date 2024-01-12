@@ -5,6 +5,12 @@ type Props = {
     title: string;
 };
 
+/**
+ * A formatted header with a divider.
+ *
+ * @param {string} title - Text to display
+ * @returns {React.FunctionComponent} A header
+ */
 const Header: React.FC<Props> = ({ title }) => {
     return (
         <>

@@ -2,6 +2,12 @@ import * as React from "react";
 import { Box, Fab, Fade, useScrollTrigger } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
+/**
+ * A button that scrolls to the top of the page. Appears after user scrolls the page down
+ * a little.
+ *
+ * @returns {React.FunctionComponent} A scroll to top button
+ */
 export default function ScrollTop() {
     const trigger = useScrollTrigger({
         disableHysteresis: true,

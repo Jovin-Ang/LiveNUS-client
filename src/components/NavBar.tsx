@@ -70,6 +70,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+/**
+ * Formatted navigation bar for the forum.
+ *
+ * @param {Page[]} pages - Array of pages to transform into buttons
+ * @param {Page[]} settings - Array of pages for user menu
+ * @param {Page[]} login - Array of pages for login and signup buttons
+ * @returns {React.FunctionComponent} A navigation bar
+ */
 const NavBar: React.FC<Props> = ({ pages, settings, login }) => {
     const auth = useAuth();
     const navigate = useNavigate();

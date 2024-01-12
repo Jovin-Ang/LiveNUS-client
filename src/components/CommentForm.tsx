@@ -24,6 +24,13 @@ type Props = {
     createComment: (comment: Comment) => void;
 };
 
+/**
+ * A form to create a comment.
+ *
+ * @param {string} postId - The ID of the parent post
+ * @param {(comment: Comment) => void} createComment - Function to display the created comment
+ * @returns {React.FunctionComponent} A comment form
+ */
 const CommentForm: React.FC<Props> = ({ postId, createComment }) => {
     const dataFormatter = new Jsona();
 

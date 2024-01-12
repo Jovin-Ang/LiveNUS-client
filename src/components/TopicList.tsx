@@ -7,6 +7,12 @@ type Props = {
     topics: Topic[];
 };
 
+/**
+ * A formatted stack of posts with header.
+ *
+ * @param {Topic[]} topics - Array of posts
+ * @returns {React.FunctionComponent} Stack of posts
+ */
 const TopicList: React.FC<Props> = ({ topics }) => {
     return (
         <>

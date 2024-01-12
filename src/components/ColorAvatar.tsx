@@ -1,31 +1,19 @@
+import { stringToColor } from "./CategoryChip";
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
-
-function stringToColor(string: string) {
-    let hash = 0;
-    let i;
-
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-        hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
-        const value = (hash >> (i * 8)) & 0xff;
-        color += `00${value.toString(16)}`.slice(-2);
-    }
-    /* eslint-enable no-bitwise */
-
-    return color;
-}
 
 type Props = {
     name: string;
     source: string;
 };
 
+/**
+ * A user avatar with fallback to color based on the name.
+ *
+ * @param {string} name - The name of the user
+ * @param {string} source - The source of the background image
+ * @returns {React.FunctionComponent} A avatar
+ */
 const ColorAvatar: React.FC<Props> = ({ name, source }) => {
     return <Avatar alt={name} src={source} sx={{ bgcolor: stringToColor(name) }} />;
 };

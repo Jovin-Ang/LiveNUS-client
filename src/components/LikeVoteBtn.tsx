@@ -27,6 +27,18 @@ type Props = {
     likes: Like[];
 };
 
+/**
+ * Dynamic clickable like and vote buttons. Clicking the buttons makes a request to the api server.
+ *
+ * @param {string} type - Either "POST" or "COMMENT"
+ * @param {string} id - ID of the post/comment
+ * @param {number} upvoteCount - Current number of upvotes
+ * @param {number} downvoteCount - Current number of downvotes
+ * @param {number} likeCount - Current number of likes
+ * @param {Vote[]} votes - Array of vote objects
+ * @param {Like[]} likes - Array of like objects
+ * @returns {React.FunctionComponent} Like and vote buttons
+ */
 const LikeVoteBtn: React.FC<Props> = ({ type, id, upvoteCount, downvoteCount, likeCount, votes, likes }) => {
     const auth = useAuth();
 
