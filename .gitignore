@@ -13,8 +13,7 @@
 /coverage
 
 # production
-/build/*
-!build/_redirects
+/build
 
 # misc
 .DS_Store
