@@ -14,10 +14,11 @@ The frontend cannot function without its backend.
 To get the React frontend running locally:
 
 1. Clone this repo.
-2. Edit the api server environment variable in `.env`.
-3. `yarn install` to install all required dependencies.
-4. `yarn start` to run the app in development mode.
-5. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+2. Copy example environment file `cp .env.example .env`
+3. Edit the api server environment variable in `.env`.
+4. `yarn install` to install all required dependencies.
+5. `yarn start` to run the app in development mode.
+6. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### Deployment
 TBA
