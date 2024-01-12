@@ -3,6 +3,11 @@ import React from "react";
 import { Container, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
 
+/**
+ * About page. Contains a short writeup about the forum.
+ *
+ * @returns {React.FunctionComponent} Content and elements of about page
+ */
 const AboutView: React.FC = () => {
     return (
         <>

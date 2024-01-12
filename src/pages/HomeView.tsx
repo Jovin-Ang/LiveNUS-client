@@ -6,6 +6,11 @@ import { Helmet } from "react-helmet";
 import { useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
 
+/**
+ * Landing page of the forum. Lists all posts.
+ *
+ * @returns {React.FunctionComponent} Content and elements of landing page
+ */
 const HomeView: React.FC = () => {
     const dataFormatter = new Jsona();
     const postsRes = useLoaderData();

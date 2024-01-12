@@ -7,6 +7,11 @@ import { Helmet } from "react-helmet";
 import { useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
 
+/**
+ * Single category page. Lists all posts from the category.
+ *
+ * @returns {React.FunctionComponent} Content and elements of single category page
+ */
 const SingleCategoryView: React.FC = () => {
     const dataFormatter = new Jsona();
     const categoryRes = useLoaderData();

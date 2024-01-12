@@ -27,6 +27,11 @@ type LoginState = {
     success: boolean;
 };
 
+/**
+ * Login page. Contains a form to sign in.
+ *
+ * @returns {React.FunctionComponent} Sign in form
+ */
 const LoginView: React.FC = () => {
     const auth = useAuth();
     const navigate = useNavigate();

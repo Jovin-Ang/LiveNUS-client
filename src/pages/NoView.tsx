@@ -2,6 +2,11 @@ import React from "react";
 import { Container, Box, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
 
+/**
+ * 404 page. Used for when page is not found.
+ *
+ * @returns {React.FunctionComponent} Content and elements of 404 page
+ */
 const NoView: React.FC = () => {
     return (
         <>

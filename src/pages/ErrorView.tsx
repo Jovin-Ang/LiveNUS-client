@@ -2,6 +2,11 @@ import React from "react";
 import { Container, Box, Typography } from "@mui/material";
 import { Helmet } from "react-helmet";
 
+/**
+ * Error page. Used for both client and server side errors.
+ *
+ * @returns {React.FunctionComponent} Content and elements of error page
+ */
 const ErrorView: React.FC = () => {
     return (
         <>

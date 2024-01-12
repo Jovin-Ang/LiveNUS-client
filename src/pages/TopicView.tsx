@@ -60,6 +60,11 @@ type SubmitState = {
     success: boolean;
 };
 
+/**
+ * Single topic page. Contains post title and body plus its comments.
+ *
+ * @returns {React.FunctionComponent} Content and elements of single topic page
+ */
 const TopicView: React.FC = () => {
     const navigate = useNavigate();
     const auth = useAuth();

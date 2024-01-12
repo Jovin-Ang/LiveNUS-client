@@ -37,6 +37,11 @@ function checkCategory(category: string) {
     return category !== "";
 }
 
+/**
+ * New topic page. Contains a form to create a new topic.
+ *
+ * @returns {React.FunctionComponent} Content and elements of new topic page
+ */
 const NewTopicView: React.FC = () => {
     const navigate = useNavigate();
     const dataFormatter = new Jsona();

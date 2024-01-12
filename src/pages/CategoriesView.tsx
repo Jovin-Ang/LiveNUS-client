@@ -7,6 +7,11 @@ import { Helmet } from "react-helmet";
 import { useLoaderData } from "react-router-dom";
 import Jsona from "jsona";
 
+/**
+ * Categories page of the forum. Lists all categories in card format.
+ *
+ * @returns {React.FunctionComponent} Content and elements of categories page
+ */
 const CategoriesView: React.FC = () => {
     const dataFormatter = new Jsona();
     const categoriesRes = useLoaderData();

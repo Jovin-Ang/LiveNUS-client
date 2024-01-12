@@ -16,6 +16,11 @@ type SignUpState = {
     success: boolean;
 };
 
+/**
+ * Sign up page. Contains a form to sign up for a new account.
+ *
+ * @returns {React.FunctionComponent} Sign up form
+ */
 const SignUpView: React.FC = () => {
     const auth = useAuth();
     const navigate = useNavigate();
