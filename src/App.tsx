@@ -14,15 +14,16 @@ import LoginView from "./pages/LoginView";
 import SignUpView from "./pages/SignUpView";
 import Page from "./types/Page";
 import { useAuth } from "./hooks/useAuth";
-import axios from "axios";
-import React from "react";
 import "./App.css";
+import React from "react";
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, defer } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { blue, orange } from "@mui/material/colors";
+import axios from "axios";
 
+// Global theme overrides
 const theme = createTheme({
     palette: {
         primary: blue,
@@ -43,6 +44,7 @@ const theme = createTheme({
     },
 });
 
+// Pages definition
 const navBarPages: Page[] = [
     { route: "/categories", name: "Categories" },
     { route: "/new", name: "New" },
@@ -61,9 +63,17 @@ const loginSignup: Page[] = [
 
 const newPostPage: Page = { route: "/new", name: "New" };
 
+/**
+ * The main application component, contains BrowserRouter from react-router to perform
+ * client side routing.
+ *
+ * @returns {React.FunctionComponent} The main app
+ */
 const App: React.FC = () => {
+    // Import authentication global context
     const auth = useAuth();
 
+    // Define Browser Router
     const router = createBrowserRouter(
         createRoutesFromElements(
             <>

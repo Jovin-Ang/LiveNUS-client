@@ -1,8 +1,11 @@
-import Like from "./Like";
+import BaseType from "./BaseType";
 
-type Vote = Omit<Like, "type"> & {
-    readonly type: "posts_vote" | "comments_vote";
+/**
+ * Interface representing a vote object. May represent a post vote or comment vote.
+ */
+interface Vote extends BaseType<"posts_vote" | "comments_vote"> {
+    /** The vote. 1 for upvote, 2 for downvote. */
     vote: number;
-};
+}
 
 export default Vote;

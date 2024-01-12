@@ -12,6 +12,19 @@ type Props = {
     loginSignup: Page[];
     newPostPage: Page;
 };
+
+/**
+ * Base user interface design layout for the forum pages, contains navigation bar, scroll to
+ * top button and loading bar should navigation be in a loading state.
+ *
+ * @param {Page[]} navBarPages - An array of pages to transform into buttons on the navigation
+ * bar
+ * @param {Page[]} userPages - An array of pages to transform into buttons on the user menu
+ * @param {Page[]} loginSignup - An array of pages defining the login and signup routes for
+ * the navigation bar
+ * @param {Page[]} newPostPage - A Page object defining the route for creating a new post
+ * @returns {React.FunctionComponent} The Layout component
+ */
 const Layout: React.FC<Props> = ({ navBarPages, userPages, loginSignup, newPostPage }) => {
     const navigation = useNavigation();
     const isLoading = navigation.state === "loading";

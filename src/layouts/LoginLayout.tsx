@@ -3,6 +3,11 @@ import { Outlet } from "react-router-dom";
 import { Avatar, Paper, Box, Grid } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
+/**
+ * Shared user interface design for login and signup pages
+ *
+ * @returns {React.FunctionComponent} The LoginLayout component
+ */
 const LoginLayout: React.FC = () => {
     return (
         <Grid container component="main" sx={{ height: "100vh" }}>

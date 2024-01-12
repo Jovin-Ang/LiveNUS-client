@@ -46,8 +46,12 @@ type ErrorResponse = {
 
 const AuthContext = createContext<AuthContextReturns | null>(null);
 
-// TODO
-// Refactor to use cookie for security
+/**
+ * A provider to wrap the app to provide global authentication objects to any child components.
+ *
+ * @param {React.ReactNode} children - The child react element
+ * @returns {React.FunctionComponent} The AuthLayout component
+ */
 const AuthProvider: React.FC<Props> = ({ children }) => {
     const userInStorage = localStorage.getItem("CUR_USER");
     const [user, setUser] = useState<User | null>(userInStorage ? JSON.parse(userInStorage) : null);
@@ -76,8 +80,16 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     }, [user]);
 
-    // Login api call
-    const login = async (data: UserLogin) => {
+    /**
+     * Makes a login request to the api. If successful, sets the user to the global
+     * authentication context.
+     *
+     * @param {UserLogin} data - An object containing email and password
+     * @returns {Promise<LoginResponse>} The login response promise
+     * @throws {ErrorResponse} If email or password is incorrect
+     * @throws {Error} If api request fails
+     */
+    const login = async (data: UserLogin): Promise<LoginResponse> => {
         try {
             const expireTime = new Date();
             const response = await axios.post("/tokens/sign_in", data);
@@ -106,7 +118,16 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
-    const signUp = async (data: UserSignUp) => {
+    /**
+     * Makes a signup request to the api. If successful, sets the user to the global
+     * authentication context.
+     *
+     * @param {UserSignUp} data - An object containing signup data
+     * @returns {Promise<LoginResponse>} The signup response promise
+     * @throws {ErrorResponse} If any signup data fails server side validation
+     * @throws {Error} If api request fails
+     */
+    const signUp = async (data: UserSignUp): Promise<LoginResponse> => {
         try {
             const expireTime = new Date();
             const response = await axios.post("/tokens/sign_up", data);
@@ -135,7 +156,9 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
-    // Clear memory and local storage
+    /**
+     * Clears global authentication context and tokens in local storage.
+     */
     const clearTokens = () => {
         setUser(null);
         setToken("");
@@ -145,7 +168,13 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         localStorage.removeItem("REFRESH_TOKEN");
     };
 
-    // Logout api call
+    /**
+     * Makes a logout request to the api. If successful, clears the global authentication
+     * context and local storage.
+     *
+     * @throws {ErrorResponse} If logout fails
+     * @throws {Error} If api request fails
+     */
     const logOut = async () => {
         try {
             await axios.post("/tokens/revoke");
@@ -160,6 +189,11 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
+    /**
+     * Checks if token has expired and renews it.
+     *
+     * @throws {Error} If api request fails
+     */
     const initToken = async () => {
         if (!token) {
             // No logged in user, simply return.
@@ -196,6 +230,12 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
+    /**
+     * Initialises user into global authentication context if valid token is found in
+     * local storage.
+     *
+     * @throws {Error} If api request fails
+     */
     const initUser = async () => {
         try {
             if (token && !user) {
@@ -221,7 +261,11 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
     };
 
-    // Initialise token and user upon every page load
+    /**
+     * Initialises token and user for the authentication context.
+     *
+     * @returns {Promise<true>} Promise of init process.
+     */
     const initAll = async () => {
         await initToken();
         await initUser();

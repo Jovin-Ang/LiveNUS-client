@@ -1,3 +1,4 @@
+import BaseType from "./BaseType";
 import Category from "./Category";
 import Like from "./Like";
 import Vote from "./Vote";
@@ -5,13 +6,9 @@ import Comment from "./Comment";
 import Status from "./Status";
 import User from "./User";
 
-type Topic = {
-    readonly type: "post";
-    readonly id: string;
+interface Topic extends BaseType<"post"> {
     title: string;
     body: string;
-    created_at: string;
-    updated_at: string;
     meta: {
         comments_count: number;
         last_activity: string;
@@ -25,6 +22,6 @@ type Topic = {
     posts_likes: Like[];
     posts_votes: Vote[];
     comments?: Comment[];
-};
+}
 
 export default Topic;
