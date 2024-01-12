@@ -11,7 +11,7 @@ The frontend cannot function without its backend.
 
 ### Development
 
-To get the react frontend running locally:
+To get the React frontend running locally:
 
 1. Clone this repo.
 2. Edit the api server environment variable in `.env`.
